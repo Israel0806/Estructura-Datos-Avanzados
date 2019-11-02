@@ -1,0 +1,26 @@
+hacer la normal 
+para cada vertice
+	prom = 0
+	para cada cara vecina al vertice
+		n = calcular normal de cada cara// precalcular la cara a la hora de crearlo
+		prom += normal
+	promedio /=cantidadVecino
+	vertice->normal = promedio
+	
+n = (AB cruz AC)/||AB . AC||
+
+Vertex
+	normal (nx,ny,nz) float
+	
+Para dibujar
+glEnable(GL_LIGHTING);
+glEnable(GL_LIGHTO);
+
+glBegin();
+	glnormal3f(v->nx,v->ny,v->nz);
+	glvertex3f(....);
+	
+	
+glEnd();
+
+hacer coloreo de la cara, arista que apunta la cara y vertice que apunta la arista

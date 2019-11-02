@@ -1,0 +1,14 @@
+# Blender MTL File: '8318ceff124c4acf81044b1eb7a74c6e.blend.blend'
+# Material Count: 1
+
+newmtl Material.004
+Ns 900.000000
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 0.000000
+illum 1
+map_Bump -bm 0.140017 C:\\Users\\USUARIO\\Desktop\\Figures\\Canteen\\source\\Flask_n.psd
+map_Kd E:\\Users\\Alden\\Pictures\\Art\\Resources\\Environment Textures\\290-free-hdri-skies-com\\290-free-hdri-skies-com.hdr

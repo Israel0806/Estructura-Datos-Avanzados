@@ -1,0 +1,26 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl Material_000001
+Ns 32.999994
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\USUARIO\\Desktop\\Enclave Eye\\source\\Eyebot\\Eyebot_n.png
+map_Kd C:\\Users\\USUARIO\\Desktop\\Enclave Eye\\source\\Eyebot\\Eyebot_d.png
+
+newmtl Material_000ca6
+Ns 32.999994
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\USUARIO\\Desktop\\Enclave Eye\\source\\Eyebot\\Eyebot_n.png
+map_Kd C:\\Users\\USUARIO\\Desktop\\Enclave Eye\\source\\Eyebot\\Eyebot_d.png

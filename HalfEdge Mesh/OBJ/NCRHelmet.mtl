@@ -1,0 +1,64 @@
+# Blender MTL File: 'None'
+# Material Count: 5
+
+newmtl rangercombathelmet
+Ns 17.647057
+Ka 1.000000 1.000000 1.000000
+Kd 0.110689 0.110689 0.110689
+Ks 0.089928 0.089928 0.089928
+Ke 0.0 0.0 0.0
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump ranger_rangercombathelmet_Normal.png
+map_Kd C:\\skyrim\\meshes\\meshes\\armor\\headgear\\combatrangerhelmet\\textures\\armor\\combatranger\\crhelmet.dds
+map_Ks ranger_rangercombathelmet_Roughness.png
+
+newmtl rangercombathelmet_NONE
+Ns 17.647057
+Ka 1.000000 1.000000 1.000000
+Kd 0.110689 0.110689 0.110689
+Ks 0.089928 0.089928 0.089928
+Ke 0.0 0.0 0.0
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump ranger_rangercombathelmet_Normal.png
+map_Kd ranger_rangercombathelmet_BaseColor.png
+map_Ks ranger_rangercombathelmet_Roughness.png
+
+newmtl rangercombathelmet_crhelmet.dds.006
+Ns 17.647057
+Ka 1.000000 1.000000 1.000000
+Kd 0.110689 0.110689 0.110689
+Ks 0.089928 0.089928 0.089928
+Ke 0.0 0.0 0.0
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump ranger_rangercombathelmet_Normal.png
+map_Kd C:\\skyrim\\meshes\\meshes\\armor\\headgear\\combatrangerhelmet\\textures\\armor\\combatranger\\crhelmet.dds
+map_Ks ranger_rangercombathelmet_Roughness.png
+
+newmtl rangercombathelmet_eyes
+Ns 76.470601
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.002713 0.000000
+Ks 0.510864 0.510864 0.510864
+Ke 0.0 0.0 0.0
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\David\\Documents\\Skyrim\\Daedric\\textures\\textures\\armor\\combatranger\\crhelmet.dds
+
+newmtl rangercombathelmetblack
+Ns 17.647057
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.0 0.0 0.0
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump -bm 0.111969 ranger_rangercombathelmetblack_Normal.png
+map_Kd ranger_rangercombathelmetblack_BaseColor.png
