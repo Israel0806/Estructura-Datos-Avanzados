@@ -101,7 +101,6 @@ void display_cb() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(-600, 600, -600, 600, -1, 1);
-	
 	if (rightClick) {
 		glLineWidth(2);
 		glBegin(GL_LINE_LOOP);
