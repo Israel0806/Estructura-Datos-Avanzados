@@ -1,0 +1,4 @@
+﻿  example0_helloTriangulation.cpp
+  example1_benchmark.cpp
+  main.cpp
+LINK : fatal error LNK1181: no se puede abrir el archivo de entrada 'D:\UCSP\Semestres\Semestre VI\Estructura-Datos-Avanzados\HalfEdge Mesh\fade3d\examples\vs2015_exampleProject\\..\..\Win32\fade3D_Win32_v142_Debug.lib'

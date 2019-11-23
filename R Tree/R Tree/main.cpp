@@ -41,7 +41,6 @@ GLvoid reshape_cb(int w, int h) {
 	glLoadIdentity();
 }
 
-
 GLvoid OnMouseClick(int button, int state, int x, int y) {
 	x = round(-width * (x - width / 2) * (x - width) / (width * width / 2) +
 			  width * x * (x - width / 2) / (width * width / 2));
@@ -104,11 +103,34 @@ void display_cb() {
 	if (rightClick) {
 		glLineWidth(2);
 		glBegin(GL_LINE_LOOP);
-		glVertex2d(mx - rangeF, my - rangeF);
-		glVertex2d(mx - rangeF, my + rangeF);
-		glVertex2d(mx + rangeF, my + rangeF);
-		glVertex2d(mx + rangeF, my - rangeF);
+			glVertex2d(mx - rangeF, my + rangeF);
+			glVertex2d(mx + rangeF, my + rangeF);
+			glVertex2d(mx + rangeF, my - rangeF);
+			glVertex2d(mx - rangeF, my - rangeF);
 		glEnd();
+		Rec* recAux = new Rec(1);
+		
+		/// creo 4 puntos 
+		Point* p1 = new Point(2);
+		p1->data[0] = mx - rangeF; p1->data[1] = my + rangeF;
+		recAux->dots.push_back(p1);
+		
+		Point* p2 = new Point(2);
+		p2->data[0] = mx + rangeF; p2->data[1] = my + rangeF;
+		recAux->dots.push_back(p2);
+		
+		Point* p3 = new Point(2);
+		p3->data[0] = mx + rangeF; p3->data[1] = my - rangeF;
+		recAux->dots.push_back(p3);
+		
+		Point* p4 = new Point(2);
+		p4->data[0] = mx - rangeF; p4->data[1] = my - rangeF;
+		recAux->dots.push_back(p4);
+		recAux->P1->copy(p1);
+		recAux->P2->copy(p3);
+		
+		arbolCochino.find(recAux);
+		delete recAux, p1, p2, p3, p4;
 	}
 	
 	glPointSize(5);
@@ -135,42 +157,11 @@ void display_cb() {
 	glutSwapBuffers();
 }
 
-//GLvoid display_cb() {
-//	glClear(GL_COLOR_BUFFER_BIT);
-//	glColor3f(0,1,0); glLineWidth(3);
-//	
-//	glOrtho(-600.0f,  600.0f,-600.0f, 600.0f, -1.0f, 1.0f);
-//	
-//	if (rightClick) {
-//		glLineWidth(2);
-//		glBegin(GL_LINE_LOOP);
-//			glVertex2d(mx-rangeF,my-rangeF);
-//			glVertex2d(mx-rangeF,my+rangeF);
-//			glVertex2d(mx+rangeF,my+rangeF);
-//			glVertex2d(mx+rangeF,my-rangeF);
-//		glEnd();
-//	}
-//	
-//	glPointSize(5);
-//	if (numClicks == 1)
-//		P1->draw();
-//	else if (numClicks == 2) {
-//		cout<<"Reset"<<endl<<endl;
-//		numClicks = 0;
-//		rec = new Rec(1);
-//		rec->addPoint(P1);
-//		rec->addPoint(P2);
-//		arbolCochino.insert(rec);
-//	}
-////	arbolCochino.getRoot()->draw(arbolCochino.getRoot() );
-//	glutSwapBuffers();
-//}
-
 GLvoid initialize() {
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(600, 600);
 	glutInitWindowPosition(400, 100);
-	glutCreateWindow("QuadTree");
+	glutCreateWindow("R Tree");
 	glutDisplayFunc(display_cb);
 	glutReshapeFunc(reshape_cb);
 	glutMotionFunc(&OnMouseMotion);

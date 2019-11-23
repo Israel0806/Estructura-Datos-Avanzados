@@ -22,6 +22,7 @@ Box::Box(int size) {
 /// size means the number of figures accepted in a rectangle
 Rec::Rec(int size) {
 	leaf = true;
+	cond = false;
 	maxSize = size;
 	boxHijo = NULL;
 	boxPadre = NULL;
@@ -71,17 +72,6 @@ void Rec::adjustRec(Point *p) {
 	}
 }
 
-void Point::draw() {
-	glColor3f(1, 0, 0);
-	glBegin(GL_POINTS);
-	glVertex2i(data[0], data[1]);
-	glEnd();
-}
-
-Box *RTree::getRoot() {
-	return root;
-}
-
 void chooseColor(int index) {
 	switch (index) {
 	case 0:
@@ -102,11 +92,29 @@ void chooseColor(int index) {
 	}
 }
 
+void Point::draw() {
+	glColor3f(1, 0, 0);
+	glBegin(GL_POINTS);
+	glVertex2i(data[0], data[1]);
+	glEnd();
+}
+
+Box *RTree::getRoot() {
+	return root;
+}
+
 void Rec::draw(int index) {
 	glLineWidth(2);
 	//	colorGreen;
 	
-	chooseColor(index);
+	if(cond){
+		colorGreen;
+		cond = false;
+	}
+	else {
+		chooseColor(index);
+	}
+
 	glBegin(GL_QUADS);
 	for (int i = 0; i < dots.size(); ++i)
 		glVertex2f(dots[i]->data[0], dots[i]->data[1]);
@@ -117,16 +125,6 @@ void Box::draw(Box *box, int index) {
 	if (!box) return;
 	/// if its leaf print figures in its rectangles
 	if (box->leaf) {
-		/// print its frame
-		//		glLineWidth(2);
-		//		colorGreen;
-		//		glBegin(GL_LINE_LOOP);
-		//			glVertex2f(box->P1->data[0], box->P1->data[1]);
-		//			glVertex2f(box->P2->data[0], box->P1->data[1]);
-		//			glVertex2f(box->P2->data[0], box->P2->data[1]);
-		//			glVertex2f(box->P1->data[0], box->P2->data[1]);
-		//		glEnd();
-		//		index = 0;
 		for (auto &rec : box->nodes)
 			if (rec)
 				rec->draw(index);
@@ -142,10 +140,10 @@ void Box::draw(Box *box, int index) {
 				index = (index + 1) % 5;
 				chooseColor(index);
 				glBegin(GL_LINE_LOOP);
-				glVertex2f(rec->P1->data[0], rec->P1->data[1]);
-				glVertex2f(rec->P2->data[0], rec->P1->data[1]);
-				glVertex2f(rec->P2->data[0], rec->P2->data[1]);
-				glVertex2f(rec->P1->data[0], rec->P2->data[1]);
+					glVertex2f(rec->P1->data[0], rec->P1->data[1]);
+					glVertex2f(rec->P2->data[0], rec->P1->data[1]);
+					glVertex2f(rec->P2->data[0], rec->P2->data[1]);
+					glVertex2f(rec->P1->data[0], rec->P2->data[1]);
 				glEnd();
 				rec->boxHijo->draw(rec->boxHijo, index);
 			}
@@ -302,7 +300,6 @@ void Rec::adjustRec() {
 	}
 	//	cout<<"Yo que se"<<endl;
 	for (auto &rec : boxHijo->nodes) {
-		//		cout<<rec<<endl;
 		if (!rec) return;
 		/// para P1 x
 		if (P1->data[0] > rec->P1->data[0])
@@ -415,8 +412,64 @@ void RTree::insert(Rec *fig) {
 				}
 			}
 		}
-		//		delete auxR1, auxR2;
 		adjustTree(R1->boxHijo);
 		adjustTree(R2->boxHijo);
 	}
 }
+
+void Box::reset(Box* box) {
+	if (box->leaf) {
+		for(auto &rec : box->nodes) {
+			if(!rec) break;
+			rec->cond = false;
+		}
+	}
+	else {
+		for(auto &rec : box->nodes) {
+			if(!rec) break;
+			reset(rec->boxHijo);
+		}
+	}
+}
+
+void RTree::reset(){
+	Box* box = root;
+	box->reset(box);
+}
+
+bool Box::doOverlap(Point* l1, Point* r1, Point* l2, Point* r2) {
+	/// If one rectangle is on left side of other 
+	if (l1->data[0] > r2->data[0] or l2->data[0] > r1->data[0]) 
+		return false; 	
+	/// If one rectangle is above other 
+	if (l1->data[1] < r2->data[1] or l2->data[1] < r1->data[1]) 
+		return false; 
+	return true;
+}
+
+bool Box::overlaps(Rec* rec1, Rec* rec2) {
+	return doOverlap(rec1->P1, rec1->P2, rec2->P1, rec2->P2);
+}
+
+void RTree::find(Rec* recAux) {
+	Box* box = root;
+	box->find(box, recAux);
+}
+
+void Box::find(Box* box, Rec* recAux) {
+	if(box->leaf){
+		for (auto &rec : box->nodes) {
+			if(!rec) return;
+			rec->cond = overlaps(rec, recAux);
+		}
+	}
+	else {
+		for (auto &rec : box->nodes) {
+			if(!rec) return;
+			if(overlaps(rec,recAux) )
+				find(rec->boxHijo, recAux);
+		}
+	}
+}
+
+
