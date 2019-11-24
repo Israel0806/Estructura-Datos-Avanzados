@@ -23,7 +23,7 @@ struct Poly{
 	
 	Poly(){};
 	
-	addPoint(Point* );
+	void addPoint(Point* );
 };
 
 struct Vertex {

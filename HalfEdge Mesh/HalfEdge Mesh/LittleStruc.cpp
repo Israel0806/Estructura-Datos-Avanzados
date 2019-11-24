@@ -15,6 +15,10 @@ Vertex::Vertex(float x, float y, float z, int id) {
 	this->edge = NULL;
 }
 
+void Poly::addPoint(Point * point){
+	points.push_back(point);
+}
+
 Vertex::~Vertex() {
 	//--vertexs;
 }

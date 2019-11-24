@@ -553,10 +553,49 @@ HalfEdge* HalfEdge::fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2]
 	
 	/// Paso 3: 
 	vector<Poly*> poligonos;
+	/** IDEA: Cosas a considerar de la creacion de poligonos
+	** Caso general:
+		Si no hay puntos de interseccion saltar a la siguiente arista
+		Eliminar la arista que revise y saltar a la siguiente
+		Marcas los vertices ya visitados(quiza es suficiente ver las aristas)
+		
+	** Caso 1:
+		Condicion de parada: Si la cara que estoy viendo no tiene otro edge que choque
+		El primer punto de interseccion sera el mas a la izquierda y mas cerca
+		Los demas puntos se elegira el edge->twin->next == point of intersection 
+		P = E.find(F) encuentra el punto de la siguiente arista que intersecta el face
+		
+		
+	** Caso 2:
+		Si no se puede saltar a ningun punto, saltar a edge->prev->SomePoint?
+		
+		
+	*/
+	for(auto &face : mesh1->LFace){
+		vector<Edge* > vecEdge;
+		Edge* edge = face->first;
+		vecEdge.push_back(edge);
+		vecEdge.push_back(edge->next);
+		vecEdge.push_back(edge->prev);
+		/// creo mi nuevo poligono
+		auto* poly = new Poly();
+
+		/// creo un punto
+		float *ver = new float[3];
+		ver[0] = edge->tail->data[0];
+		ver[1] = edge->tail->data[1];
+		ver[2] = edge->tail->data[2];
+		Point* point = new Point(ver);
+		delete ver;
+		
+		poly->addPoint(point);
+	}
+	
+	
 	
  	/// Paso 4: Triangulate Life
-	auto *malla = triangulatePoly(poligonos);
-	delete malla;
+//	auto *malla = triangulatePoly(poligonos);
+//	delete malla;
 	/// Paso 5: 
 	
 	
@@ -1082,7 +1121,7 @@ void HalfEdge::draw(bool drawT, bool drawL, bool drawP, float *movePos) {
 	glEnd();
 	}
 	}*/
-	
+	int index=0;
 	glPointSize(8);
 	for (auto &edge : LEdge) {
 		colorGreen;
