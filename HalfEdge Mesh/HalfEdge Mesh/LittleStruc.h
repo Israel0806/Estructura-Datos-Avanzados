@@ -24,6 +24,8 @@ struct Poly{
 	Poly(){};
 	
 	void addPoint(Point* );
+	
+	~Poly();
 };
 
 struct Vertex {

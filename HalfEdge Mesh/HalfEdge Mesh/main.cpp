@@ -116,14 +116,13 @@ bool findName(string name) {
 	file.open("Files.txt");
 	while (getline(file, line)) {
 		lower(line);
-		if (strcmp(line.c_str(), name.c_str()))
+		if ( !strcmp(line.c_str(), name.c_str()) )
 			return true;
 	}
 	return false;
 }
 
 /// Cambio una de las mallas cargadas
-
 void showFigureNames() {
 	ifstream file;
 	string line;
@@ -135,6 +134,7 @@ void showFigureNames() {
 	cout << endl;
 }
 
+/// leo el nombre de la figura, la busco en un txt con todos los nombres de las mallas
 void changeFigure() {
 	string newName;
 	cout << "La figura que cambiara es " << figure[index] << endl;
@@ -143,12 +143,12 @@ void changeFigure() {
 			cout << "Ingrese el nombre del archivo OBJ: ";
 			cin >> newName;
 			lower(newName);
-			if (newName == "help") {
+			if (newName == "help" or newName == "ayuda")
 				showFigureNames();
-			} else if (newName == "exit")
+			else if (newName == "exit" or newName == "esc" or newName == "salir")
 				return;
 			else if (!findName(newName))
-				cout << "El nombre ingresado no existe" << endl;
+				cout << "El nombre ingresado no existe" << endl << endl;
 			else
 				break;
 		}

@@ -528,28 +528,36 @@ algoritmo que decida por que interseccion ir)
 
 5) Crear nueva malla, eliminar antigua malla y devolver
 
+Creo que en el paso 4 se puede crear la nueva malla
+
 *******/
 
 /// Fusiona dos mallas y retorna la fusion eliminando la primera mallla ingresada
 HalfEdge* HalfEdge::fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2][3]) {
-//	chrono::system_clock::time_point t;
-//	chrono::duration<float, milli> r;
+	cout<<"Fusion of two meshes"<<endl;
+	chrono::system_clock::time_point t;
+	chrono::duration<float, milli> r;
+	
 	/// Paso 0 inicializar mis mallas
 	mesh1->reSet();
 	mesh2->reSet();
-//	t = chrono::system_clock::now();
+	t = chrono::system_clock::now();
 	/// Paso 1: ColorVertex
+	
 	mesh1->colorVertex(mesh2, movePos, 0);
 	mesh2->colorVertex(mesh1, movePos, 1);
-//	r = chrono::system_clock::now() - t;
-//	cout << "Find inside vertex time: " << r.count() / 1000 << " seconds" << endl;
+	
+	r = chrono::system_clock::now() - t;
+	cout << "Find inside vertex time: " << r.count() / 1000 << " seconds" << endl;
 	
 	/// Paso 2: ColorLine
-//	t = chrono::system_clock::now();
+	t = chrono::system_clock::now();
+	
 	mesh1->colorLine(mesh2, movePos, 0);
 	mesh2->colorLine(mesh1, movePos, 1);
-//	r = chrono::system_clock::now() - t;
-//	cout << "Find line intersections time: " << r.count() / 1000 << " seconds" << endl << endl;
+	
+	r = chrono::system_clock::now() - t;
+	cout << "Find line intersections time: " << r.count() / 1000 << " seconds" << endl << endl;
 	
 	/// Paso 3: 
 	vector<Poly*> poligonos;
@@ -559,15 +567,32 @@ HalfEdge* HalfEdge::fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2]
 		Eliminar la arista que revise y saltar a la siguiente
 		Marcas los vertices ya visitados(quiza es suficiente ver las aristas)
 		
-	** Caso 1:
+		
+	** Caso 1: Un poligono toda la cara
 		Condicion de parada: Si la cara que estoy viendo no tiene otro edge que choque
+		Veo dos cosas:
+		1) si puedo llegar a los demas vertices, conecto con P2
+		2) sino conecto al punto de interseccion de la arista mas cercana
 		El primer punto de interseccion sera el mas a la izquierda y mas cerca
-		Los demas puntos se elegira el edge->twin->next == point of intersection 
+		Los demas puntos se elegira el edge->twin->next == point of intersection or prev
+			En pocas palabras buscar de la otra cara otro punto que intersecte la cara
 		P = E.find(F) encuentra el punto de la siguiente arista que intersecta el face
 		
 		
-	** Caso 2:
-		Si no se puede saltar a ningun punto, saltar a edge->prev->SomePoint?
+	** Caso 2: Dos poligonos en la cara
+		Si no se puede saltar a ningun punto, saltar a edge->prev->SomePoint?( en triangulo pequenho
+		Si existe un punto de interseccion al que puede saltar pero ese es el unico
+			Entonces debe saltar al punto de interseccion mas cercano de una arista de la cara
+	
+	** Caso 3: Tres poligonos en la cara
+		Se soluciona mejorando el caso 2
+		Con un while
+	
+	** Caso 4:
+	
+	** Caso 5:
+	
+	** Caso 6: Una arista corta mas de dos caras
 		
 		
 	*/
@@ -1218,20 +1243,17 @@ HalfEdge::~HalfEdge() {
 	do {
 		cond = false;
 		if (!LVertex.empty()) {
-			Vertex *v = LVertex.back();
-			delete v;
+			delete LVertex.back();
 			LVertex.pop_back();
 			cond = true;
 		}
 		if (!LEdge.empty()) {
-			Edge *e = LEdge.back();
-			delete e;
+			delete LEdge.back();
 			LEdge.pop_back();
 			cond = true;
 		}
 		if (!LFace.empty()) {
-			Face *f = LFace.back();
-			delete f;
+			delete LFace.back();
 			LFace.pop_back();
 			cond = true;
 		}

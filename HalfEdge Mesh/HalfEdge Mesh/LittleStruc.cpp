@@ -19,6 +19,13 @@ void Poly::addPoint(Point * point){
 	points.push_back(point);
 }
 
+Poly::~Poly(){
+	while (!points.empty() ) {
+		delete points.back();
+		points.pop_back();
+	}
+}
+
 Vertex::~Vertex() {
 	//--vertexs;
 }
@@ -71,8 +78,7 @@ Edge::Edge(Vertex *tail, Vertex *head, Edge *prev, Edge *next, Edge *twin, Face 
 Edge::~Edge() {
 	--edges;
 	while (!iLPoint.empty() ) {
-		Point* point = iLPoint.back();
-		delete point;
+		delete iLPoint.back();
 		iLPoint.pop_back();
 	}
 }
