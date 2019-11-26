@@ -82,6 +82,8 @@ public:
 	
 	vector<Vertex *> find3Vertex(int id1, int id2, int id3);
 	
+	vector<Poly* > createPolygons(HalfEdge* mesh1);
+	
 	void crossProduct(double *normal, double *AB, double *AC);
 	
 	void draw(bool drawT, bool drawL, bool drawP, float *movePos);
@@ -92,7 +94,7 @@ public:
 	
 	vector<int> findVertexF(int start, Vertex *ver1, Vertex *ver2, Vertex *ver3);
 	
-	float* rayTriangleIntersect(double orig[3], double dir[3],double vertices[3][3], double snormal[3]);
+	double* rayTriangleIntersect(double orig[3], double dir[3],double vertices[3][3], double snormal[3]);
 	
 	~HalfEdge();
 };

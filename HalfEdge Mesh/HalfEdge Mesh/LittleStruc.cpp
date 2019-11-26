@@ -1,8 +1,14 @@
 #include "LittleStruc.h"
 
-Point::Point(float* ver) {
+Point::Point(double* ver) {
 	for(int i = 0; i < 3; ++i)
 		data[i] = ver[i];
+	marked = false;
+}
+
+Point::Point() {
+	for(int i = 0; i < 3; ++i)
+		data[i] = 0;
 	marked = false;
 }
 
@@ -15,8 +21,13 @@ Vertex::Vertex(float x, float y, float z, int id) {
 	this->edge = NULL;
 }
 
-void Poly::addPoint(Point * point){
+void Poly::addPoint(Point * point) {
 	points.push_back(point);
+}
+
+void Poly::addPoint(Point point) {
+	Point* P = new Point(point.data);
+	points.push_back(P);
 }
 
 Poly::~Poly(){
@@ -75,6 +86,25 @@ Edge::Edge(Vertex *tail, Vertex *head, Edge *prev, Edge *next, Edge *twin, Face 
 	cond = false;
 }
 
+double* Edge::find(Face* face) {
+	for (int i = 0; i < iLFace.size(); ++i)
+		if(iLFace[i] == face)
+			return iLPoint[i]->data;
+}
+
+Edge* Edge::nextJump(Edge* edge, Face* face){
+	Edge* edgeCopy = edge;
+	edge = edge->next;
+	do {
+		for (int i = 0; i < edge->iLFace.size(); ++i)
+			if(edge->iLFace[i] == face)
+				return edge;
+		
+		edge = edge->next;
+	} while(edge != edgeCopy);
+	return edge;
+}
+
 Edge::~Edge() {
 	--edges;
 	while (!iLPoint.empty() ) {
@@ -83,9 +113,35 @@ Edge::~Edge() {
 	}
 }
 
-Face::Face(Edge *first) {
+Face::Face(Edge *edge) {
 	id = faces++;
-	this->first = first;
+	this->edge = edge;
+}
+
+void Point::set(double *ver) {
+	for (int i = 0; i < 3; ++i) 
+		data[i] = ver[i];
+}
+
+bool compareValue(Point* P1, Point P2) {
+	for (int i = 0; i < 3; ++i) 
+		if(P1->data[i] == P2.data[i]) 
+			return true;
+	return false;	
+}
+
+/// halla el siguiente punto que debo conectar el poligono
+double* Face::findClosest(Point* P, Point P1) {
+	int i, minIdx = 0;
+	Point *minPoint = new Point();
+	
+	/// guardo el indice con la menor distancia
+	for (i = 1; i < iLEdge.size(); ++i)
+		if ( !compareValue(iLPoint[i], P1) ) /// obvio, el P1
+			if (distance(P, iLPoint[i]) < distance(P, iLPoint[minIdx]) )
+				minIdx = i;
+	
+	return iLPoint[minIdx]->data;
 }
 
 Face::~Face() {

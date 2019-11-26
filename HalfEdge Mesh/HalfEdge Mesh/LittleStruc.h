@@ -15,7 +15,11 @@ struct Point{
 	double data[3];// x, y, z;
 	bool marked;
 	
-	Point(float* ver);
+	Point();
+	
+	void set(double* ver);
+	
+	Point(double* ver);
 };
 
 struct Poly{
@@ -24,6 +28,8 @@ struct Poly{
 	Poly(){};
 	
 	void addPoint(Point* );
+	
+	void addPoint(Point );
 	
 	~Poly();
 };
@@ -66,6 +72,10 @@ struct Edge {
 	
 	Edge();
 	
+	double* find(Face* face);
+	
+	Edge* nextJump(Edge* edge, Face* face);
+	
 	Edge(Vertex *tail, Vertex *head, Edge *prev, Edge *next, Edge *twin, Face *face);
 	
 	~Edge();
@@ -73,13 +83,15 @@ struct Edge {
 
 struct Face {
 	int id;
-	Edge *first;
+	Edge *edge;
 	double normal[3];
 	static int faces;
 	
 	/// nuevo para fusion
 	vector<Edge* > iLEdge;
 	vector<Point* > iLPoint;
+	
+	double* findClosest(Point* P,Point P1);
 	
 	Face(Edge *first);
 	

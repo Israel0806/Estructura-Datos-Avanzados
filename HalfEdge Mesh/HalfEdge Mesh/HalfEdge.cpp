@@ -208,7 +208,7 @@ void HalfEdge::divideLoopHash() {
 		t2 = chrono::system_clock::now();
 		vector<vector<int>> newFaces;
 		vector<int> f(3);
-		Edge *e1 = face->first;
+		Edge *e1 = face->edge;
 		Vertex *v1 = e1->tail;
 		Vertex *v2 = e1->next->tail;
 		Vertex *v3 = e1->prev->tail;
@@ -458,7 +458,7 @@ double HalfEdge::dotProduct(double *p1, double *p2) {
 
 /// hallar la normal de una cara
 void HalfEdge::normalFace(Face *f) {
-	Edge *e = f->first;
+	Edge *e = f->edge;
 	Vertex *v1 = e->tail;
 	Vertex *v2 = e->head;
 	Vertex *v3 = e->next->head;
@@ -532,6 +532,151 @@ Creo que en el paso 4 se puede crear la nueva malla
 
 *******/
 
+Edge* findPoint(Edge* edge, Face* F1, Face* face) {
+	/// E va a ser cada una de las aristas de la cara de mesh2
+	Edge* E = F1->edge;
+	Edge* Ecopy = E;
+	do {
+		/// busco en un vertice la caara que intersecta con la cara de 
+		/// la malla 1
+		for (int j = 0; j < E->iLFace.size(); ++j) {
+			if(E->iLFace[j] == face) {
+				return E;
+			}
+		}
+		
+		E = E->next;
+	} while(E != Ecopy);	
+	return NULL;
+}
+
+double distance(Point P1, Point P2) {
+	double dis = 0;
+	for(int i = 0; i < 3; ++i)
+		dis += pow(P1.data[i] - P2.data[i],2);
+	return sqrt(dis);
+}
+
+double distance(Point P1, Point *P2) {
+	double dis = 0;
+	for(int i = 0; i < 3; ++i)
+		dis += pow(P1.data[i] - P2->data[i],2);
+	return sqrt(dis);
+}
+
+Edge* closestLeft(HalfEdge* mesh, Edge* edge){
+	Point FirstP(edge->iLPoint[0]->data);
+	/// caras que intersecta la arista
+	Face* F1 = edge->iLFace[0];
+	Face* F2 = edge->iLFace[1];
+	
+	/// busco los puntos que intersectan la cara, no la arista
+	Edge* E1 = findPoint(edge, F1, edge->leftFace);
+	Edge* E2 = findPoint(edge, F2, edge->leftFace);
+	
+	Point P1,P2;
+	for (int i = 0; i < 2; ++i) {
+		if(E1->iLFace[i] == edge->leftFace) 
+			for(int j = 0; j < 3; ++j)
+				P1.data[j] = E1->iLPoint[i]->data[j];
+		
+		if(E2->iLFace[i] == edge->leftFace) 
+			for(int j = 0; j < 3; ++j)
+				P2.data[j] = E2->iLPoint[i]->data[j];
+	}
+	
+	/// Devuelvo el menor
+	return distance(FirstP,P1) < distance(FirstP,P2) ? E1 : E2;
+}
+
+vector<Poly* > HalfEdge::createPolygons(HalfEdge* mesh1, HalfEdge* mesh2) {
+	vector<Poly*> poligonos;
+	/** IDEA: Cosas a considerar de la creacion de poligonos
+	** Caso general:
+	Si no hay puntos de interseccion saltar a la siguiente arista
+	Eliminar la arista que revise y saltar a la siguiente
+	Marcas los vertices ya visitados(quiza es suficiente ver las aristas)
+	
+	
+	** Caso 1: Un poligono toda la cara
+	Condicion de parada: Si la cara que estoy viendo no tiene otro edge que choque
+	Veo dos cosas:
+	1) si puedo llegar a los demas vertices, conecto con P2
+	2) sino conecto al punto de interseccion de la arista mas cercana
+	El primer punto de interseccion sera el mas a la izquierda y mas cerca
+	Los demas puntos se elegira el edge->twin->next == point of intersection or prev
+	En pocas palabras buscar de la otra cara otro punto que intersecte la cara
+	P = E.find(F) encuentra el punto de la siguiente arista que intersecta el face
+	
+	
+	** Caso 2: Dos poligonos en la cara
+	Si no se puede saltar a ningun punto, saltar a edge->prev->SomePoint?( en triangulo pequenho
+	Si existe un punto de interseccion al que puede saltar pero ese es el unico
+	Entonces debe saltar al punto de interseccion mas cercano de una arista de la cara
+	Si el ultimo salto es en un punto de una arista que no pertenece a la misma marcarla( aumentar el contador)
+	
+	
+	** Caso 3: Tres poligonos en la cara
+	Se soluciona mejorando el caso 2
+	Con un while
+	
+	** Caso 4:
+	
+	** Caso 5:
+	
+	** Caso 6: Una arista corta mas de dos caras
+	
+	
+	*/
+	
+	/// por cada cara creo los poligonos
+	for(auto &face : mesh1->LFace){
+		/// quiza reemplazar por vector<Vertex*>
+		vector<Edge* > vecEdge;
+		vector<Edge* > vecAux;
+		Edge* edge= face->edge;
+		
+		/// anhado mis aristas a mi vector
+		vecEdge.push_back(edge);
+		vecEdge.push_back(edge->next);
+		vecEdge.push_back(edge->prev);
+		vecAux = vecEdge;
+		
+		/// creo mi nuevo poligono
+		auto* poly = new Poly();
+		
+		/// anhado un punto
+		Point* point = new Point(edge->tail->data);
+		
+		/// anhado el punto a mi Poligono
+		poly->addPoint(point);
+		
+		/// 
+		while (!vecEdge.empty() ) {
+			edge = vecEdge.back();
+			vecEdge.pop_back();
+			Point P1(edge->iLPoint[0]->data);
+			Face* F1 = edge->iLFace[0];
+			Face* F2 = edge->iLFace[1];
+			
+			/// elijo la primer arista que contniene
+			/// el primero que debo saltar
+			Edge* E = closestLeft(mesh2, edge);
+			/// P sera el siguiente que debo saltar
+			Point P(E->find(face));
+			poly->addPoint(P);
+			while(true) {
+				Edge* ECopy = E;
+				E = E->nextJump(E->twin,edge->leftFace);
+				if(E == ECopy) {
+					P.set(edge->leftFace->findClosest(poly->points.back(), P1) );
+				}
+				P.set(E->find(face) );
+			}
+		} /// fin while(!vecEdge.empty())
+	} /// face : mesh1->LFace
+}
+
 /// Fusiona dos mallas y retorna la fusion eliminando la primera mallla ingresada
 HalfEdge* HalfEdge::fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2][3]) {
 	cout<<"Fusion of two meshes"<<endl;
@@ -542,8 +687,8 @@ HalfEdge* HalfEdge::fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2]
 	mesh1->reSet();
 	mesh2->reSet();
 	t = chrono::system_clock::now();
-	/// Paso 1: ColorVertex
 	
+	/// Paso 1: ColorVertex
 	mesh1->colorVertex(mesh2, movePos, 0);
 	mesh2->colorVertex(mesh1, movePos, 1);
 	
@@ -560,61 +705,7 @@ HalfEdge* HalfEdge::fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2]
 	cout << "Find line intersections time: " << r.count() / 1000 << " seconds" << endl << endl;
 	
 	/// Paso 3: 
-	vector<Poly*> poligonos;
-	/** IDEA: Cosas a considerar de la creacion de poligonos
-	** Caso general:
-		Si no hay puntos de interseccion saltar a la siguiente arista
-		Eliminar la arista que revise y saltar a la siguiente
-		Marcas los vertices ya visitados(quiza es suficiente ver las aristas)
-		
-		
-	** Caso 1: Un poligono toda la cara
-		Condicion de parada: Si la cara que estoy viendo no tiene otro edge que choque
-		Veo dos cosas:
-		1) si puedo llegar a los demas vertices, conecto con P2
-		2) sino conecto al punto de interseccion de la arista mas cercana
-		El primer punto de interseccion sera el mas a la izquierda y mas cerca
-		Los demas puntos se elegira el edge->twin->next == point of intersection or prev
-			En pocas palabras buscar de la otra cara otro punto que intersecte la cara
-		P = E.find(F) encuentra el punto de la siguiente arista que intersecta el face
-		
-		
-	** Caso 2: Dos poligonos en la cara
-		Si no se puede saltar a ningun punto, saltar a edge->prev->SomePoint?( en triangulo pequenho
-		Si existe un punto de interseccion al que puede saltar pero ese es el unico
-			Entonces debe saltar al punto de interseccion mas cercano de una arista de la cara
-	
-	** Caso 3: Tres poligonos en la cara
-		Se soluciona mejorando el caso 2
-		Con un while
-	
-	** Caso 4:
-	
-	** Caso 5:
-	
-	** Caso 6: Una arista corta mas de dos caras
-		
-		
-	*/
-	for(auto &face : mesh1->LFace){
-		vector<Edge* > vecEdge;
-		Edge* edge = face->first;
-		vecEdge.push_back(edge);
-		vecEdge.push_back(edge->next);
-		vecEdge.push_back(edge->prev);
-		/// creo mi nuevo poligono
-		auto* poly = new Poly();
-
-		/// creo un punto
-		float *ver = new float[3];
-		ver[0] = edge->tail->data[0];
-		ver[1] = edge->tail->data[1];
-		ver[2] = edge->tail->data[2];
-		Point* point = new Point(ver);
-		delete ver;
-		
-		poly->addPoint(point);
-	}
+	vector<Poly* > poligonos = createPolygons(mesh1, mesh2);
 	
 	
 	
@@ -820,7 +911,7 @@ HalfEdge* HalfEdge::triangulatePoly(vector<Poly *> poligonos) {
 
 
 /// Colorea marcando los puntos que deben ser eliminados
-float* HalfEdge::rayTriangleIntersect(double orig[3],
+double* HalfEdge::rayTriangleIntersect(double orig[3],
 									double dir[3],
 									double vertices[3][3],
 										double normal[3]) {
@@ -843,7 +934,7 @@ float* HalfEdge::rayTriangleIntersect(double orig[3],
 	
 	
 	// punto intersecado en el plano(triangulo)
-	float *p = new float[3];
+	double *p = new double[3];
 	for (i = 0; i < 3; ++i)
 		p[i] = orig[i] + t * dir[i];
 	
@@ -882,7 +973,7 @@ void HalfEdge::colorVertex(HalfEdge *Mesh, float movePos[2][3], int index) {
 		int par = 0;
 		double vertices[3][3];
 		for (auto &face : Mesh->LFace) {
-			Edge *e = face->first;
+			Edge *e = face->edge;
 			v0 = e->head->data;
 			v1 = e->tail->data;
 			v2 = e->next->head->data;
@@ -906,7 +997,7 @@ void HalfEdge::colorVertex(HalfEdge *Mesh, float movePos[2][3], int index) {
 			double normal[3];
 			crossProduct(normal, v0v1, v0v2);
 			
-			float* p = rayTriangleIntersect(orig, dir, vertices, normal);
+			double* p = rayTriangleIntersect(orig, dir, vertices, normal);
 			if (p) {
 				++par;
 				delete p;
@@ -935,7 +1026,7 @@ void HalfEdge::colorLine(HalfEdge* Mesh, float movePos[2][3], int index){
 			orig[i] = _v0[i] + movePos[index][i];
 		}
 		for (auto &face : Mesh->LFace) {
-			Edge *e = face->first;
+			Edge *e = face->edge;
 			v0 = e->head->data;
 			v1 = e->tail->data;
 			v2 = e->next->head->data;
@@ -960,7 +1051,7 @@ void HalfEdge::colorLine(HalfEdge* Mesh, float movePos[2][3], int index){
 			double normal[3];
 			crossProduct(normal, v0v1, v0v2);
 			
-			float* p = rayTriangleIntersect(orig, dir, vertices, normal);
+			double* p = rayTriangleIntersect(orig, dir, vertices, normal);
 			if (p) {
 				double a[3],b[3];
 				for (int i = 0; i < 3; ++i) {
@@ -1193,7 +1284,7 @@ void HalfEdge::draw(bool drawT, bool drawL, bool drawP, float *movePos) {
 	}
 	
 	for (auto &f : LFace) {
-		Edge *e1 = f->first;
+		Edge *e1 = f->edge;
 		Vertex *v1 = e1->head;
 		e1 = e1->next;
 		Vertex *v2 = e1->head;
