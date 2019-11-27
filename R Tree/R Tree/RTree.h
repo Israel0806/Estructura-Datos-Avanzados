@@ -60,6 +60,8 @@ struct Rec {
 	
 	void addPoint(Point *p);
 	
+	~Rec();
+	
 };
 
 struct Box { /// I
@@ -81,6 +83,8 @@ struct Box { /// I
 	bool overlaps(Rec* rec1, Rec* rec2);
 	
 	bool doOverlap(Point* l1, Point* r1, Point* l2, Point* r2);
+	
+	~Box();
 };
 
 //RTree
@@ -111,6 +115,8 @@ public:
 	bool search(Rec *fig);
 	
 	void insert(Rec *fig);
+	
+	~RTree();
 };
 
 #endif

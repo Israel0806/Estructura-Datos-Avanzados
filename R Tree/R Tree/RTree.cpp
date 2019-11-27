@@ -432,7 +432,7 @@ void Box::reset(Box* box) {
 	}
 }
 
-void RTree::reset(){
+void RTree::reset() {
 	Box* box = root;
 	box->reset(box);
 }
@@ -460,7 +460,7 @@ void Box::find(Box* box, Rec* recAux) {
 	if(box->leaf){
 		for (auto &rec : box->nodes) {
 			if(!rec) return;
-			rec->cond = overlaps(rec, recAux);
+				rec->cond = overlaps(rec, recAux);
 		}
 	}
 	else {
@@ -470,6 +470,28 @@ void Box::find(Box* box, Rec* recAux) {
 				find(rec->boxHijo, recAux);
 		}
 	}
+}
+
+Rec::~Rec() {
+	if (!leaf) 
+		delete boxHijo;
+	
+	for (int i = 0; i < dots.size(); ++i) 
+		delete dots[i];
+	
+	dots.clear();
+	delete P1, P2;
+}
+
+Box::~Box() {
+	for (int i = 0; i < index; ++i) {
+		delete nodes[i];
+	}
+	delete P1, P2;
+}
+
+RTree::~RTree() {
+	delete root;
 }
 
 

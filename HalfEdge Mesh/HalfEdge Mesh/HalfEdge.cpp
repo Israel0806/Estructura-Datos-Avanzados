@@ -651,7 +651,17 @@ vector<Poly* > HalfEdge::createPolygons(HalfEdge* mesh1, HalfEdge* mesh2) {
 		/// anhado el punto a mi Poligono
 		poly->addPoint(point);
 		
-		/// 
+		/**
+		Condicion de parada: Si la cara que estoy viendo no tiene otro edge que choque
+		Veo dos cosas:
+		1) si puedo llegar a los demas vertices, conecto con P2
+		2) sino conecto al punto de interseccion de la arista mas cercana
+		El primer punto de interseccion sera el mas a la izquierda y mas cerca
+		Los demas puntos se elegira el edge->twin->next == point of intersection or prev
+		En pocas palabras buscar de la otra cara otro punto que intersecte la cara
+		P = E.find(F) encuentra el punto de la siguiente arista que intersecta el face
+		
+		*/
 		while (!vecEdge.empty() ) {
 			edge = vecEdge.back();
 			vecEdge.pop_back();
@@ -659,18 +669,25 @@ vector<Poly* > HalfEdge::createPolygons(HalfEdge* mesh1, HalfEdge* mesh2) {
 			Face* F1 = edge->iLFace[0];
 			Face* F2 = edge->iLFace[1];
 			
-			/// elijo la primer arista que contniene
+			/// Elijo la primer arista que contniene
 			/// el primero que debo saltar
 			Edge* E = closestLeft(mesh2, edge);
 			/// P sera el siguiente que debo saltar
 			Point P(E->find(face));
 			poly->addPoint(P);
+			
+			/// Salto en aristas hasta que no haya mas saltos
 			while(true) {
 				Edge* ECopy = E;
+				/// salto a twin->next o twin->prev, 
+				/// donde se encuentre la intercepcion
 				E = E->nextJump(E->twin,edge->leftFace);
-				if(E == ECopy) {
-					P.set(edge->leftFace->findClosest(poly->points.back(), P1) );
-				}
+				/// si la unica arista que choca es la misma, significa
+				/// no hay otra arista que choque
+				if(E == ECopy)
+					/// salta al punto mas cercano
+					/// verificar que punto es
+					P.set(edge->leftFace->findClosest(poly->points.back(), P1) );			
 				P.set(E->find(face) );
 			}
 		} /// fin while(!vecEdge.empty())

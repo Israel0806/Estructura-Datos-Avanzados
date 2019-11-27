@@ -35,16 +35,17 @@ class HalfEdge {
 	vector<Vertex *> sep2(string line, string del);
 	
 public:
+	vector<float> massCenter;
+	
 	HalfEdge();
 	
-	vector<float> massCenter;
+	void reSet();
+	
 	void savePos();
 	
 	bool getWorked();
 	
 	void justDivide();
-	
-	void reSet();
 	
 	void divideLoopBF();
 	
@@ -74,23 +75,23 @@ public:
 	
 	double dotProduct(double* p1, double* p2);
 	
-	void insertVertex(float x, float y, float z, int id);
-	
 	HalfEdge* triangulatePoly(vector<Poly* > poligonos);
 	
-	HalfEdge* fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2][3]);
+	void insertVertex(float x, float y, float z, int id);
 	
 	vector<Vertex *> find3Vertex(int id1, int id2, int id3);
-	
-	vector<Poly* > createPolygons(HalfEdge* mesh1);
 	
 	void crossProduct(double *normal, double *AB, double *AC);
 	
 	void draw(bool drawT, bool drawL, bool drawP, float *movePos);
+
+	void colorLine(HalfEdge* Mesh, float movePos[2][3], int index);
+	
+	vector<Poly* > createPolygons(HalfEdge* mesh1, HalfEdge* mesh2);
 	
 	void colorVertex(HalfEdge* Mesh, float movePos[2][3], int index);
 	
-	void colorLine(HalfEdge* Mesh, float movePos[2][3], int index);
+	HalfEdge* fusionDBZ(HalfEdge* mesh1, HalfEdge* mesh2, float movePos[2][3]);
 	
 	vector<int> findVertexF(int start, Vertex *ver1, Vertex *ver2, Vertex *ver3);
 	
