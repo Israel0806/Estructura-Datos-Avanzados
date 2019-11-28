@@ -10,6 +10,7 @@
 
 #endif
 
+#include <time.h>
 
 #include "Rtree.h"
 
@@ -28,8 +29,8 @@ int rangeF = 50;
 
 RTree arbolCochino(3);
 Rec *rec;
-Point *P1;
-Point *P2;
+Point *P1 = NULL;
+Point *P2 = NULL;
 
 GLvoid reshape_cb(int w, int h) {
 	if (w == 0 || h == 0) return;
@@ -78,8 +79,60 @@ GLvoid OnMouseMotion(int x, int y) {
 	}
 }
 
+void resize(Rec *rec) {
+	for (auto &point : rec->dots) {
+		if (point->data[0] < rec->P1->data[0])
+			rec->P1->data[0] = point->data[0];
+		else if (point->data[0] > rec->P2->data[0])
+			rec->P2->data[0] = point->data[0];
+		if (point->data[1] > rec->P1->data[1])
+			rec->P1->data[1] = point->data[1];
+		else if (point->data[1] < rec->P2->data[1])
+			rec->P2->data[1] = point->data[1];
+	}
+}
+
+/// me genera n cuadrados
+void generateRec(int n) {
+	numClicks = 0;
+	if (numClicks) {
+		if (P1)
+			delete P1;
+		if (P2)
+			delete P2;
+	}
+	for (int i = 0; i < n; ++i) {
+		P1 = new Point(3);
+		P2 = new Point(3);
+		P1->data[0] = rand() % 1200 - width + 1;
+		P1->data[1] = rand() % 1200 - height + 1;
+		P2->data[0] = rand() % 1200 - width + 1;
+		P2->data[1] = rand() % 1200 - height + 1;
+		
+		rec = new Rec(1);
+		rec->addPoint(P1);
+		Point *p = new Point(3);
+		p->data[0] = P2->data[0];
+		p->data[1] = P1->data[1];
+		rec->addPoint(p);
+		rec->addPoint(P2);
+		p = new Point(3);
+		p->data[0] = P1->data[0];
+		p->data[1] = P2->data[1];
+		rec->addPoint(p);
+		resize(rec);
+		arbolCochino.insert(rec);
+	}
+}
+
 GLvoid window_key(unsigned char key, int x, int y) {
+	int n;
 	switch (key) {
+	case 'g':
+		n = rand() % 3 + 1;
+		cout << endl << n << " figures to be inserted" << endl;
+		generateRec(n);
+		break;
 	case KEY_BACKSPACE:
 		numClicks = 0;
 		break;
@@ -103,28 +156,32 @@ void display_cb() {
 	if (rightClick) {
 		glLineWidth(2);
 		glBegin(GL_LINE_LOOP);
-			glVertex2d(mx - rangeF, my + rangeF);
-			glVertex2d(mx + rangeF, my + rangeF);
-			glVertex2d(mx + rangeF, my - rangeF);
-			glVertex2d(mx - rangeF, my - rangeF);
+		glVertex2d(mx - rangeF, my + rangeF);
+		glVertex2d(mx + rangeF, my + rangeF);
+		glVertex2d(mx + rangeF, my - rangeF);
+		glVertex2d(mx - rangeF, my - rangeF);
 		glEnd();
-		Rec* recAux = new Rec(1);
+		Rec *recAux = new Rec(1);
 		
 		/// creo 4 puntos 
-		Point* p1 = new Point(2);
-		p1->data[0] = mx - rangeF; p1->data[1] = my + rangeF;
+		Point *p1 = new Point(2);
+		p1->data[0] = mx - rangeF;
+		p1->data[1] = my + rangeF;
 		recAux->dots.push_back(p1);
 		
-		Point* p2 = new Point(2);
-		p2->data[0] = mx + rangeF; p2->data[1] = my + rangeF;
+		Point *p2 = new Point(2);
+		p2->data[0] = mx + rangeF;
+		p2->data[1] = my + rangeF;
 		recAux->dots.push_back(p2);
 		
-		Point* p3 = new Point(2);
-		p3->data[0] = mx + rangeF; p3->data[1] = my - rangeF;
+		Point *p3 = new Point(2);
+		p3->data[0] = mx + rangeF;
+		p3->data[1] = my - rangeF;
 		recAux->dots.push_back(p3);
 		
-		Point* p4 = new Point(2);
-		p4->data[0] = mx - rangeF; p4->data[1] = my - rangeF;
+		Point *p4 = new Point(2);
+		p4->data[0] = mx - rangeF;
+		p4->data[1] = my - rangeF;
 		recAux->dots.push_back(p4);
 		recAux->P1->copy(p1);
 		recAux->P2->copy(p3);
@@ -150,6 +207,7 @@ void display_cb() {
 		p->data[0] = P1->data[0];
 		p->data[1] = P2->data[1];
 		rec->addPoint(p);
+		resize(rec);
 		arbolCochino.insert(rec);
 	}
 	arbolCochino.getRoot()->draw(arbolCochino.getRoot(), 0);
@@ -158,6 +216,7 @@ void display_cb() {
 }
 
 GLvoid initialize() {
+	srand(time(NULL));
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowSize(600, 600);
 	glutInitWindowPosition(400, 100);

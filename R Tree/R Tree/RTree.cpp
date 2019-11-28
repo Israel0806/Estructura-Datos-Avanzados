@@ -107,14 +107,13 @@ void Rec::draw(int index) {
 	glLineWidth(2);
 	//	colorGreen;
 	
-	if(cond){
+	if (cond) {
 		colorGreen;
 		cond = false;
-	}
-	else {
+	} else {
 		chooseColor(index);
 	}
-
+	
 	glBegin(GL_QUADS);
 	for (int i = 0; i < dots.size(); ++i)
 		glVertex2f(dots[i]->data[0], dots[i]->data[1]);
@@ -140,10 +139,10 @@ void Box::draw(Box *box, int index) {
 				index = (index + 1) % 5;
 				chooseColor(index);
 				glBegin(GL_LINE_LOOP);
-					glVertex2f(rec->P1->data[0], rec->P1->data[1]);
-					glVertex2f(rec->P2->data[0], rec->P1->data[1]);
-					glVertex2f(rec->P2->data[0], rec->P2->data[1]);
-					glVertex2f(rec->P1->data[0], rec->P2->data[1]);
+				glVertex2f(rec->P1->data[0], rec->P1->data[1]);
+				glVertex2f(rec->P2->data[0], rec->P1->data[1]);
+				glVertex2f(rec->P2->data[0], rec->P2->data[1]);
+				glVertex2f(rec->P1->data[0], rec->P2->data[1]);
 				glEnd();
 				rec->boxHijo->draw(rec->boxHijo, index);
 			}
@@ -417,66 +416,64 @@ void RTree::insert(Rec *fig) {
 	}
 }
 
-void Box::reset(Box* box) {
+void Box::reset(Box *box) {
 	if (box->leaf) {
-		for(auto &rec : box->nodes) {
-			if(!rec) break;
+		for (auto &rec : box->nodes) {
+			if (!rec) break;
 			rec->cond = false;
 		}
-	}
-	else {
-		for(auto &rec : box->nodes) {
-			if(!rec) break;
+	} else {
+		for (auto &rec : box->nodes) {
+			if (!rec) break;
 			reset(rec->boxHijo);
 		}
 	}
 }
 
 void RTree::reset() {
-	Box* box = root;
+	Box *box = root;
 	box->reset(box);
 }
 
-bool Box::doOverlap(Point* l1, Point* r1, Point* l2, Point* r2) {
+bool Box::doOverlap(Point *l1, Point *r1, Point *l2, Point *r2) {
 	/// If one rectangle is on left side of other 
-	if (l1->data[0] > r2->data[0] or l2->data[0] > r1->data[0]) 
-		return false; 	
+	if (l1->data[0] > r2->data[0] or l2->data[0] > r1->data[0])
+		return false;
 	/// If one rectangle is above other 
-	if (l1->data[1] < r2->data[1] or l2->data[1] < r1->data[1]) 
-		return false; 
+	if (l1->data[1] < r2->data[1] or l2->data[1] < r1->data[1])
+		return false;
 	return true;
 }
 
-bool Box::overlaps(Rec* rec1, Rec* rec2) {
+bool Box::overlaps(Rec *rec1, Rec *rec2) {
 	return doOverlap(rec1->P1, rec1->P2, rec2->P1, rec2->P2);
 }
 
-void RTree::find(Rec* recAux) {
-	Box* box = root;
+void RTree::find(Rec *recAux) {
+	Box *box = root;
 	box->find(box, recAux);
 }
 
-void Box::find(Box* box, Rec* recAux) {
-	if(box->leaf){
+void Box::find(Box *box, Rec *recAux) {
+	if (box->leaf) {
 		for (auto &rec : box->nodes) {
-			if(!rec) return;
-				rec->cond = overlaps(rec, recAux);
+			if (!rec) return;
+			rec->cond = overlaps(rec, recAux);
 		}
-	}
-	else {
+	} else {
 		for (auto &rec : box->nodes) {
-			if(!rec) return;
-			if(overlaps(rec,recAux) )
+			if (!rec) return;
+			if (overlaps(rec, recAux))
 				find(rec->boxHijo, recAux);
 		}
 	}
 }
 
 Rec::~Rec() {
-	if (!leaf) 
+	if (!leaf)
 		delete boxHijo;
 	
-	for (int i = 0; i < dots.size(); ++i) 
+	for (int i = 0; i < dots.size(); ++i)
 		delete dots[i];
 	
 	dots.clear();

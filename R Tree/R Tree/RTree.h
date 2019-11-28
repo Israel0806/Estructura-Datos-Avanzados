@@ -18,8 +18,11 @@
 using namespace std;
 
 class Box;
+
 struct Rec;
+
 class RTree;
+
 struct Point;
 
 struct Point {
@@ -74,15 +77,15 @@ struct Box { /// I
 	
 	Box(int size);
 	
-	void reset(Box* box);
+	void reset(Box *box);
 	
 	void draw(Box *box, int index);
 	
-	void find(Box* box, Rec* recAux);
+	void find(Box *box, Rec *recAux);
 	
-	bool overlaps(Rec* rec1, Rec* rec2);
+	bool overlaps(Rec *rec1, Rec *rec2);
 	
-	bool doOverlap(Point* l1, Point* r1, Point* l2, Point* r2);
+	bool doOverlap(Point *l1, Point *r1, Point *l2, Point *r2);
 	
 	~Box();
 };
@@ -103,14 +106,14 @@ class RTree {
 	
 public:
 	void find();
-
+	
 	void reset();
 	
 	Box *getRoot();
 	
-	RTree(int size);	
+	RTree(int size);
 	
-	void find(Rec* recAux);
+	void find(Rec *recAux);
 	
 	bool search(Rec *fig);
 	
