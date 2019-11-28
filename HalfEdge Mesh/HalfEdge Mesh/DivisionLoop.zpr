@@ -23,7 +23,7 @@ cursor=167:17
 open=true
 [source]
 path=HalfEdge.cpp
-cursor=661:30
+cursor=392:1
 open=true
 [source]
 path=HashTable.cpp

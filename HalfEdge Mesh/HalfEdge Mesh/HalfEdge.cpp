@@ -396,6 +396,7 @@ void HalfEdge::divideLoopHash() {
 	LFace = newMalla->LFace;
 	Tree->deleteAll(Tree->getRoot());
 	delete Tree;
+	delete newMalla;
 	calculateNormal();
 	r = chrono::system_clock::now() - t;
 	cout << "Time to build vertexs: " << sum2 << endl;
