@@ -16,6 +16,9 @@
 
 #define KEY_BACKSPACE 8
 #define KEY_ESC 27
+# define KEY_PLUS 43
+# define KEY_MINUS 45
+
 
 using namespace std;
 
@@ -93,7 +96,7 @@ void resize(Rec *rec) {
 }
 
 /// me genera n cuadrados
-void generateRec(int n) {
+void generateRec() {
 	numClicks = 0;
 	if (numClicks) {
 		if (P1)
@@ -101,40 +104,46 @@ void generateRec(int n) {
 		if (P2)
 			delete P2;
 	}
-	for (int i = 0; i < n; ++i) {
-		P1 = new Point(3);
-		P2 = new Point(3);
-		P1->data[0] = rand() % 1200 - width + 1;
-		P1->data[1] = rand() % 1200 - height + 1;
-		P2->data[0] = rand() % 1200 - width + 1;
-		P2->data[1] = rand() % 1200 - height + 1;
-		
-		rec = new Rec(1);
-		rec->addPoint(P1);
-		Point *p = new Point(3);
-		p->data[0] = P2->data[0];
-		p->data[1] = P1->data[1];
-		rec->addPoint(p);
-		rec->addPoint(P2);
-		p = new Point(3);
-		p->data[0] = P1->data[0];
-		p->data[1] = P2->data[1];
-		rec->addPoint(p);
-		resize(rec);
-		arbolCochino.insert(rec);
-	}
+	P1 = new Point(3);
+	P2 = new Point(3);
+	int x = rand() % 1195 - width + 6;
+	int y = rand() % 1195 - width + 6;
+	
+	P1->data[0] = x - rand()%20 - 5;
+	P1->data[1] = y + rand()%20;
+	P2->data[0] = x + rand()%20;
+	P2->data[1] = y - rand()%20 - 5;
+	
+	rec = new Rec(1);
+	rec->addPoint(P1);
+	Point *p = new Point(3);
+	p->data[0] = P2->data[0];
+	p->data[1] = P1->data[1];
+	rec->addPoint(p);
+	rec->addPoint(P2);
+	p = new Point(3);
+	p->data[0] = P1->data[0];
+	p->data[1] = P2->data[1];
+	rec->addPoint(p);
+	resize(rec);
+	arbolCochino.insert(rec);
 }
 
 GLvoid window_key(unsigned char key, int x, int y) {
 	int n;
 	switch (key) {
 	case 'g':
-		n = rand() % 3 + 1;
 		cout << endl << n << " figures to be inserted" << endl;
-		generateRec(n);
+		generateRec();
 		break;
 	case KEY_BACKSPACE:
 		numClicks = 0;
+		break;
+	case KEY_PLUS:
+		rangeF += 5;
+		break;
+	case KEY_MINUS:
+		rangeF -= 5;
 		break;
 	case KEY_ESC:
 		delete P1, P2, rec;
@@ -155,6 +164,8 @@ void display_cb() {
 	glOrtho(-600, 600, -600, 600, -1, 1);
 	if (rightClick) {
 		glLineWidth(2);
+		colorBlack;
+		
 		glBegin(GL_LINE_LOOP);
 		glVertex2d(mx - rangeF, my + rangeF);
 		glVertex2d(mx + rangeF, my + rangeF);

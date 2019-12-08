@@ -61,13 +61,13 @@ void Rec::adjustRec(Point *p) {
 		if (p->data[0] < P1->data[0])
 			P1->data[0] = p->data[0];
 		/// para P2 x
-		if (p->data[0] > P2->data[0])
+		else if (p->data[0] > P2->data[0])
 			P2->data[0] = p->data[0];
 		/// para P1 y
 		if (p->data[1] > P1->data[1])
 			P1->data[1] = p->data[1];
 		/// para P2 y
-		if (p->data[1] < P2->data[1])
+		else if (p->data[1] < P2->data[1])
 			P2->data[1] = p->data[1];
 	}
 }
@@ -139,10 +139,10 @@ void Box::draw(Box *box, int index) {
 				index = (index + 1) % 5;
 				chooseColor(index);
 				glBegin(GL_LINE_LOOP);
-				glVertex2f(rec->P1->data[0], rec->P1->data[1]);
-				glVertex2f(rec->P2->data[0], rec->P1->data[1]);
-				glVertex2f(rec->P2->data[0], rec->P2->data[1]);
-				glVertex2f(rec->P1->data[0], rec->P2->data[1]);
+					glVertex2f(rec->P1->data[0], rec->P1->data[1]);
+					glVertex2f(rec->P2->data[0], rec->P1->data[1]);
+					glVertex2f(rec->P2->data[0], rec->P2->data[1]);
+					glVertex2f(rec->P1->data[0], rec->P2->data[1]);
 				glEnd();
 				rec->boxHijo->draw(rec->boxHijo, index);
 			}
@@ -185,7 +185,7 @@ Box *RTree::chooseLeaf(Rec *fig) {
 	double maxArea, newArea;
 	int index;
 	while (true) {
-		//verifico si la Box es hoja
+		///verifico si la Box es hoja
 		if (box->leaf)
 			return box;
 		
@@ -216,6 +216,7 @@ void RTree::adjustTree(Box *box) {
 		} else {
 			for (auto &rec : box->nodes) {
 				if (!rec) break;
+				rec->adjustRec();
 				/// para P1 x
 				if (box->P1->data[0] > rec->P1->data[0])
 					box->P1->data[0] = rec->P1->data[0];
@@ -292,6 +293,7 @@ Rec *RTree::chooseNext(vector<Rec *> &looseRec, Rec *R1, Rec *R2) {
 
 /// ajusto el Rec segun los Rec de su boxHijo
 void Rec::adjustRec() {
+	if (!boxHijo) return;
 	if (boxHijo->index == 1) {
 		P1->copy(boxHijo->P1);
 		P2->copy(boxHijo->P2);
@@ -319,12 +321,12 @@ void Rec::adjustRec() {
 void RTree::insert(Rec *fig) {
 	Box *box = chooseLeaf(fig);
 	if (box->index < box->maxSize) {
-		cout << "Se inserto la figura sin cambios" << endl;
+		cout << endl << "Se inserto la figura sin cambios" << endl << endl;
 		box->nodes[box->index++] = fig;
 		fig->boxPadre = box;
 		adjustTree(box);
 	} else {
-		cout << "Se hizo un split" << endl;
+		cout << endl << "Se hizo un split" << endl;
 		box->nodes[box->index++] = fig;
 		fig->boxPadre = box;
 		box->leaf = false;
@@ -377,12 +379,13 @@ void RTree::insert(Rec *fig) {
 		box->index = 2;
 		box->nodes[0] = R1;
 		box->nodes[1] = R2;
-		
-		///Pick the next who's enlargement area will be the least
+		adjustTree(box);
+		/// Pick the next who's enlargement area will be the least
 		double areaR1, areaR2;
 		Rec *next;
 		while (!looseRec.empty()) {
-			/// if one side needs the rest entries, give them all
+			/// If one side needs the rest entries, give them all
+			/// Si un lado esta lleno mas bien
 			if (R1->boxHijo->index == R1->boxHijo->maxSize - R1->boxHijo->index + 1) {
 				while (!looseRec.empty()) {
 					R2->boxHijo->nodes[R2->boxHijo->index++] = looseRec.back();

@@ -30,7 +30,7 @@ void Poly::addPoint(Point point) {
 	points.push_back(P);
 }
 
-Poly::~Poly(){
+Poly::~Poly() {
 	while (!points.empty() ) {
 		delete points.back();
 		points.pop_back();
@@ -123,7 +123,7 @@ void Point::set(double *ver) {
 		data[i] = ver[i];
 }
 
-bool compareValue(Point* P1, Point P2) {
+bool areEqual(Point* P1, Point P2) {
 	for (int i = 0; i < 3; ++i) 
 		if(P1->data[i] == P2.data[i]) 
 			return true;
@@ -137,7 +137,7 @@ double* Face::findClosest(Point* P, Point P1) {
 	
 	/// guardo el indice con la menor distancia
 	for (i = 1; i < iLEdge.size(); ++i)
-		if ( !compareValue(iLPoint[i], P1) ) /// obvio, el P1
+		if ( !areEqual(iLPoint[i], P1) ) /// obvio, el P1
 			if (distance(P, iLPoint[i]) < distance(P, iLPoint[minIdx]) )
 				minIdx = i;
 	

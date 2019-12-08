@@ -69,8 +69,8 @@ struct Rec {
 
 struct Box { /// I
 	bool leaf;
-	int index;
-	int maxSize;
+	int index; /// m
+	int maxSize; /// M
 	Point *P1, *P2;
 	Rec *recPadre; /// rec de arriba
 	vector<Rec *> nodes;
